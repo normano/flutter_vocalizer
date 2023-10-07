@@ -22,4 +22,9 @@ class MethodChannelPersonalVoiceFlutter extends PersonalVoiceFlutterPlatform {
         .invokeMethod<String>('requestPersonalVoiceAuthorization');
     return result;
   }
+
+  @override
+  Future<void> speak(String sentence) async {
+    await methodChannel.invokeMethod('speak', {'sentence': sentence});
+  }
 }

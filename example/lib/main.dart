@@ -60,12 +60,23 @@ class _MyAppState extends State<MyApp> {
             children: [
               Text('Running on: $_platformVersion\n'),
               ElevatedButton(
-                  onPressed: askPermission, child: const Text("Get Permission"))
+                  onPressed: askPermission,
+                  child: const Text("Get Permission")),
+              ElevatedButton(onPressed: speak, child: const Text("Speak")),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> speak() async {
+    try {
+      var result = await _personalVoiceFlutterPlugin.speak(
+          "The Langstroth hive revolutionized beekeeping. Lorenzo Langstroth noticed that the hives beekeepers used at the time were just empty boxes with a lid. When beekeepers would lift the lid to harvest honey they would damage and break the comb that the bees had worked so hard to make. Langstroth noticed that the bees would leave 3/8 of an inch of space in between each section of comb they had built (also known as bee space). Langstroth then designed wood frames that could be lifted out of the hive and inspected individually. This allowed for beekeepers to manipulate, remove, replace and inspect frames for diseases without disturbing the entire hive. A Langstroth hive can either be 8 or 10 frames but all hives and frames have the same standard dimensions if you wish to build your own.");
+    } on PlatformException {
+      print("error");
+    }
   }
 
   Future<void> askPermission() async {
