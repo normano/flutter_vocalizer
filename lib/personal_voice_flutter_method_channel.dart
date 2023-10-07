@@ -11,7 +11,15 @@ class MethodChannelPersonalVoiceFlutter extends PersonalVoiceFlutterPlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version =
+        await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
+  }
+
+  @override
+  Future<String?> requestPersonalVoiceAuthorization() async {
+    final result = await methodChannel
+        .invokeMethod<String>('requestPersonalVoiceAuthorization');
+    return result;
   }
 }
