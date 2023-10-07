@@ -1,7 +1,7 @@
 name: personal_voice_flutter
-description: A new Flutter plugin project.
+description: This project uses the iOS personal voice to speak text in your own voice.
 version: 0.0.1
-homepage:
+homepage: https://github.com/rockarts/personal_voice_flutter
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
