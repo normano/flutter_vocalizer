@@ -29,11 +29,6 @@ import 'package:personal_voice_flutter/personal_voice_flutter.dart';
 
 ...
 
-// Be sure to add this line if `PackageInfo.fromPlatform()` is called before runApp()
-WidgetsFlutterBinding.ensureInitialized();
-
-...
-
 final permission =
         await _personalVoiceFlutterPlugin.requestPersonalVoiceAuthorization();
 
