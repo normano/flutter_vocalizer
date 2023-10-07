@@ -8,7 +8,8 @@ abstract class PersonalVoiceFlutterPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static PersonalVoiceFlutterPlatform _instance = MethodChannelPersonalVoiceFlutter();
+  static PersonalVoiceFlutterPlatform _instance =
+      MethodChannelPersonalVoiceFlutter();
 
   /// The default instance of [PersonalVoiceFlutterPlatform] to use.
   ///
@@ -24,6 +25,10 @@ abstract class PersonalVoiceFlutterPlatform extends PlatformInterface {
   }
 
   Future<String?> getPlatformVersion() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  Future<String?> requestPersonalVoiceAuthorization() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }
