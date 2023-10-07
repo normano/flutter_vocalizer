@@ -29,6 +29,12 @@ abstract class PersonalVoiceFlutterPlatform extends PlatformInterface {
   }
 
   Future<String?> requestPersonalVoiceAuthorization() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+    throw UnimplementedError(
+        'requestPersonalVoiceAuthorization() has not been implemented.');
+  }
+
+  Future<void> speak(String sentence) {
+    throw UnimplementedError(
+        'speak(String sentence) has not been implemented.');
   }
 }

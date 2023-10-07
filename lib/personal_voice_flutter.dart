@@ -9,4 +9,8 @@ class PersonalVoiceFlutter {
     return PersonalVoiceFlutterPlatform.instance
         .requestPersonalVoiceAuthorization();
   }
+
+  Future<void> speak(String sentence) {
+    return PersonalVoiceFlutterPlatform.instance.speak(sentence);
+  }
 }
