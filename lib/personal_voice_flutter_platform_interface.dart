@@ -33,7 +33,7 @@ abstract class PersonalVoiceFlutterPlatform extends PlatformInterface {
         'requestPersonalVoiceAuthorization() has not been implemented.');
   }
 
-  Future<void> speak(String text, {double volume = 1.0, double pitch = 1.0, double rate = 0.5}) {
+  Future<void> speak(String text, {double volume = 0.5, double pitch = 1.0, double rate = 0.5}) {
     throw UnimplementedError(
         'speak(String sentence) has not been implemented.');
   }

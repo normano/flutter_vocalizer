@@ -13,16 +13,16 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    print("Received method call: \(call.method)")
-            print("Arguments: \(String(describing: call.arguments))")
-
-            if let args = call.arguments as? [String: Any] {
-                for (key, value) in args {
-                    print("Argument Key: \(key), Value: \(value), Type: \(type(of: value))")
-                }
-            } else {
-                print("Arguments are not a dictionary")
-            }
+//    NSLog("Received method call: \(call.method)")
+//            NSLog("Arguments: \(String(describing: call.arguments))")
+//
+//            if let args = call.arguments as? [String: Any] {
+//                for (key, value) in args {
+//                    NSLog("Argument Key: \(key), Value: \(value), Type: \(type(of: value))")
+//                }
+//            } else {
+//                NSLog("Arguments are not a dictionary")
+//            }
 
         switch call.method {
         case "getPlatformVersion":
@@ -32,11 +32,7 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin {
         case "speak":
           if let args = call.arguments as? [String: Any] {
             let text = args["text"] as! String
-//            let volume = args["volume"] as? Float ?? 1.0
-//            let pitch = args["pitch"] as? Float ?? 1.0
-//            let rate = args["rate"] as? Float ?? AVSpeechUtteranceDefaultSpeechRate
-
-            let volume = (args["volume"] as? NSNumber)?.floatValue ?? 1.0
+            let volume = (args["volume"] as? NSNumber)?.floatValue ?? 0.5
             let pitch = (args["pitch"] as? NSNumber)?.floatValue ?? 1.0
             let rate = (args["rate"] as? NSNumber)?.floatValue ?? AVSpeechUtteranceDefaultSpeechRate
             speak(sentence: text, volume: volume, pitch: pitch, rate: rate)
@@ -76,13 +72,13 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin {
         if #available(iOS 17.0, *) {
           stop();
           let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { $0.voiceTraits.contains(.isPersonalVoice) }
-          let utterance = AVSpeechUtterance(string: sentence)
-          utterance.volume = volume
-          utterance.pitchMultiplier = pitch
-          utterance.rate = rate
           if let voice = personalVoices.first {
-              utterance.voice = voice
-              self.synthesizer.speak(utterance)
+            let utterance = AVSpeechUtterance(string: sentence)
+            utterance.voice = voice
+            utterance.volume = volume
+            utterance.pitchMultiplier = pitch
+            utterance.rate = rate
+            self.synthesizer.speak(utterance)
           }
         }
     }

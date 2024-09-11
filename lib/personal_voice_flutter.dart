@@ -10,7 +10,7 @@ class PersonalVoiceFlutter {
         .requestPersonalVoiceAuthorization();
   }
 
-  Future<void> speak(String sentence, {double volume = 1.0, double pitch = 1.0, double rate = 0.5}) {
+  Future<void> speak(String sentence, {double volume = 0.5, double pitch = 1.0, double rate = 0.5}) {
     return PersonalVoiceFlutterPlatform.instance.speak(sentence, volume: volume, pitch: pitch, rate: rate);
   }
 
