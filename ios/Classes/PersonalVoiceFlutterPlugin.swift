@@ -26,19 +26,72 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin {
             } else {
                 result("Invalid argument")
             }
+            result(nil)
+        case "stop":
+          stop()
+          result(nil)
+        case "resume":
+          resume()
+          result(nil)
+        case "pause":
+          pause()
+          result(nil)
+        case "isSpeaking":
+          result(self.synthesizer.isSpeaking)
+        case "isPaused":
+          result(self.synthesizer.isPaused)
+        case "isSupported":
+            result(isSupported())
         default:
-            result(FlutterMethodNotImplemented)
+          result(FlutterMethodNotImplemented)
         }
+    }
+
+    private func isSupported() -> Bool {
+
+      if #available(iOS 17.0, *) {
+        return true
+      }
+
+      return false
     }
     
     private func speak(sentence:String) {
         if #available(iOS 17.0, *) {
-            let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { $0.voiceTraits.contains(.isPersonalVoice) }
-            let utterance2 = AVSpeechUtterance(string: sentence)
-            if let voice = personalVoices.first {
-                utterance2.voice = voice
-                self.synthesizer.speak(utterance2)
-            }
+          stop();
+          let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { $0.voiceTraits.contains(.isPersonalVoice) }
+          let utterance2 = AVSpeechUtterance(string: sentence)
+          if let voice = personalVoices.first {
+              utterance2.voice = voice
+              self.synthesizer.speak(utterance2)
+          }
+        }
+    }
+
+    private func resume() {
+        if #available(iOS 17.0, *) {
+          if(self.synthesizer.isSpeaking || !self.synthesizer.isPaused) {
+            return
+          }
+          self.synthesizer.continueSpeaking()
+        }
+    }
+
+    private func pause() {
+        if #available(iOS 17.0, *) {
+          if(!self.synthesizer.isSpeaking || self.synthesizer.isPaused) {
+            return
+          }
+          self.synthesizer.pauseSpeaking(at: .immediate)
+        }
+    }
+
+    private func stop() {
+        if #available(iOS 17.0, *) {
+          if(!self.synthesizer.isSpeaking) {
+            return
+          }
+          self.synthesizer.stopSpeaking(at: .immediate)
         }
     }
     

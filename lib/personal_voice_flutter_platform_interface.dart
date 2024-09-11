@@ -37,4 +37,31 @@ abstract class PersonalVoiceFlutterPlatform extends PlatformInterface {
     throw UnimplementedError(
         'speak(String sentence) has not been implemented.');
   }
+
+  Future<void> stop() {
+    throw UnimplementedError(
+        'stop() has not been implemented.');
+  }
+
+  Future<void> resume() {
+    throw UnimplementedError(
+        'continueSpeaking() has not been implemented.');
+  }
+
+  Future<void> pause() {
+    throw UnimplementedError(
+        'pauseSpeaking() has not been implemented.');
+  }
+
+  Future<bool> isSpeaking() async {
+    return false;
+  }
+
+  Future<bool> isPaused() async {
+    return false;
+  }
+
+  Future<bool> isSupported() async {
+    return false;
+  }
 }

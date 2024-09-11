@@ -13,4 +13,28 @@ class PersonalVoiceFlutter {
   Future<void> speak(String sentence) {
     return PersonalVoiceFlutterPlatform.instance.speak(sentence);
   }
+
+  Future<void> stop() {
+    return PersonalVoiceFlutterPlatform.instance.stop();
+  }
+
+  Future<void> pause() {
+    return PersonalVoiceFlutterPlatform.instance.pause();
+  }
+
+  Future<void> resume() {
+    return PersonalVoiceFlutterPlatform.instance.resume();
+  }
+
+  Future<bool> isSpeaking() {
+    return PersonalVoiceFlutterPlatform.instance.isSpeaking();
+  }
+
+  Future<bool> isPaused() {
+    return PersonalVoiceFlutterPlatform.instance.isPaused();
+  }
+
+  Future<bool> isSupported() {
+    return PersonalVoiceFlutterPlatform.instance.isSupported();
+  }
 }

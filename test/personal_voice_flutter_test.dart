@@ -10,6 +10,54 @@ class MockPersonalVoiceFlutterPlatform
 
   @override
   Future<String?> getPlatformVersion() => Future.value('42');
+
+  @override
+  Future<String?> requestPersonalVoiceAuthorization() {
+    // TODO: implement requestPersonalVoiceAuthorization
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> speak(String sentence) {
+    // TODO: implement speak
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isPaused() {
+    // TODO: implement isPaused
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isSpeaking() {
+    // TODO: implement isSpeaking
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isSupported() {
+    // TODO: implement isSupported
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> pause() {
+    // TODO: implement pause
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> resume() {
+    // TODO: implement resume
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> stop() {
+    // TODO: implement stop
+    throw UnimplementedError();
+  }
 }
 
 void main() {

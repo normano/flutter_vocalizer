@@ -27,4 +27,35 @@ class MethodChannelPersonalVoiceFlutter extends PersonalVoiceFlutterPlatform {
   Future<void> speak(String sentence) async {
     await methodChannel.invokeMethod('speak', {'sentence': sentence});
   }
+
+  @override
+  Future<void> stop() async {
+    await methodChannel.invokeMethod('stop');
+  }
+
+  @override
+  Future<void> resume() async {
+    await methodChannel.invokeMethod('resume');
+  }
+
+  @override
+  Future<void> pause() async {
+    await methodChannel.invokeMethod('pause');
+  }
+
+  @override
+  Future<bool> isSpeaking() async {
+    return await methodChannel.invokeMethod('isSpeaking');
+  }
+
+  @override
+  Future<bool> isPaused() async {
+    return await methodChannel.invokeMethod('isPaused');
+  }
+
+  @override
+  Future<bool> isSupported() async {
+    final bool isSupported = await methodChannel.invokeMethod('isSupported');
+    return isSupported;
+  }
 }
