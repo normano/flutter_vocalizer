@@ -13,17 +13,32 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    print("Received method call: \(call.method)")
+            print("Arguments: \(String(describing: call.arguments))")
+
+            if let args = call.arguments as? [String: Any] {
+                for (key, value) in args {
+                    print("Argument Key: \(key), Value: \(value), Type: \(type(of: value))")
+                }
+            } else {
+                print("Arguments are not a dictionary")
+            }
+
         switch call.method {
         case "getPlatformVersion":
             result("iOS " + UIDevice.current.systemVersion)
         case "requestPersonalVoiceAuthorization":
             requestPersonalVoiceAuthorization(result: result)
         case "speak":
-          if let args = call.arguments as? [String: Any],
-            let text = args["text"] as? String {
-            let volume = args["volume"] as? Float ?? 1.0
-            let pitch = args["pitch"] as? Float ?? 1.0
-            let rate = args["rate"] as? Float ?? AVSpeechUtteranceDefaultSpeechRate
+          if let args = call.arguments as? [String: Any] {
+            let text = args["text"] as! String
+//            let volume = args["volume"] as? Float ?? 1.0
+//            let pitch = args["pitch"] as? Float ?? 1.0
+//            let rate = args["rate"] as? Float ?? AVSpeechUtteranceDefaultSpeechRate
+
+            let volume = (args["volume"] as? NSNumber)?.floatValue ?? 1.0
+            let pitch = (args["pitch"] as? NSNumber)?.floatValue ?? 1.0
+            let rate = (args["rate"] as? NSNumber)?.floatValue ?? AVSpeechUtteranceDefaultSpeechRate
             speak(sentence: text, volume: volume, pitch: pitch, rate: rate)
             result(nil)
           }
