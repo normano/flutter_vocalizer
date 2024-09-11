@@ -24,8 +24,16 @@ class MethodChannelPersonalVoiceFlutter extends PersonalVoiceFlutterPlatform {
   }
 
   @override
-  Future<void> speak(String sentence) async {
-    await methodChannel.invokeMethod('speak', {'sentence': sentence});
+  Future<void> speak(String text, {double volume = 1.0, double pitch = 1.0, double rate = 0.5}) async {
+    await methodChannel.invokeMethod(
+      'speak',
+      {
+        'text': text,
+        'volume': volume,
+        'pitch': pitch,
+        'rate': rate,
+      }
+    );
   }
 
   @override

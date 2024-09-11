@@ -19,14 +19,15 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin {
         case "requestPersonalVoiceAuthorization":
             requestPersonalVoiceAuthorization(result: result)
         case "speak":
-            if let args = call.arguments as? [String: Any],
-               let sentence = args["sentence"] as? String {
-                // Handle yourString here
-                speak(sentence: sentence)
-            } else {
-                result("Invalid argument")
-            }
+          if let args = call.arguments as? [String: Any],
+            let text = args["text"] as? String {
+            let volume = args["volume"] as? Float ?? 1.0
+            let pitch = args["pitch"] as? Float ?? 1.0
+            let rate = args["rate"] as? Float ?? AVSpeechUtteranceDefaultSpeechRate
+            speak(sentence: text, volume: volume, pitch: pitch, rate: rate)
             result(nil)
+          }
+          result(nil)
         case "stop":
           stop()
           result(nil)
@@ -56,14 +57,17 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin {
       return false
     }
     
-    private func speak(sentence:String) {
+    private func speak(sentence:String, volume: Float, pitch: Float, rate: Float) {
         if #available(iOS 17.0, *) {
           stop();
           let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { $0.voiceTraits.contains(.isPersonalVoice) }
-          let utterance2 = AVSpeechUtterance(string: sentence)
+          let utterance = AVSpeechUtterance(string: sentence)
+          utterance.volume = volume
+          utterance.pitchMultiplier = pitch
+          utterance.rate = rate
           if let voice = personalVoices.first {
-              utterance2.voice = voice
-              self.synthesizer.speak(utterance2)
+              utterance.voice = voice
+              self.synthesizer.speak(utterance)
           }
         }
     }

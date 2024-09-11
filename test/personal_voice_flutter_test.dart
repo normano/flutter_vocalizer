@@ -16,13 +16,6 @@ class MockPersonalVoiceFlutterPlatform
     // TODO: implement requestPersonalVoiceAuthorization
     throw UnimplementedError();
   }
-
-  @override
-  Future<void> speak(String sentence) {
-    // TODO: implement speak
-    throw UnimplementedError();
-  }
-
   @override
   Future<bool> isPaused() {
     // TODO: implement isPaused
@@ -56,6 +49,12 @@ class MockPersonalVoiceFlutterPlatform
   @override
   Future<void> stop() {
     // TODO: implement stop
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> speak(String text, {double volume = 1.0, double pitch = 1.0, double rate = 0.5}) {
+    // TODO: implement speak
     throw UnimplementedError();
   }
 }
