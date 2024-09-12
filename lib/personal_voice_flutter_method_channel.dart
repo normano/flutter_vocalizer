@@ -5,9 +5,26 @@ import 'personal_voice_flutter_platform_interface.dart';
 
 /// An implementation of [PersonalVoiceFlutterPlatform] that uses method channels.
 class MethodChannelPersonalVoiceFlutter extends PersonalVoiceFlutterPlatform {
+
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('personal_voice_flutter');
+
+  MethodChannelPersonalVoiceFlutter() {
+    methodChannel.setMethodCallHandler(_methodCallHandler);
+  }
+
+  Future<void> _methodCallHandler(MethodCall call) async {
+    switch (call.method) {
+      case 'onSpeechCompleted':
+        if(onSpeechComplete != null) {
+          onSpeechComplete!();
+        }
+        break;
+      default:
+        // print('Unknown method ${call.method}');
+    }
+  }
 
   @override
   Future<String?> getPlatformVersion() async {

@@ -3,6 +3,9 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'personal_voice_flutter_method_channel.dart';
 
 abstract class PersonalVoiceFlutterPlatform extends PlatformInterface {
+
+  void Function()? onSpeechComplete;
+
   /// Constructs a PersonalVoiceFlutterPlatform.
   PersonalVoiceFlutterPlatform() : super(token: _token);
 

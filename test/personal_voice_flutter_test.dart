@@ -57,6 +57,9 @@ class MockPersonalVoiceFlutterPlatform
     // TODO: implement speak
     throw UnimplementedError();
   }
+
+  @override
+  void Function()? onSpeechComplete;
 }
 
 void main() {

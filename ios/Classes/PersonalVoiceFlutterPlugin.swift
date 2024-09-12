@@ -2,14 +2,21 @@ import Flutter
 import UIKit
 import AVFoundation
 
-public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin {
+public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin, AVSpeechSynthesizerDelegate {
     
     let synthesizer = AVSpeechSynthesizer()
-    
+    var channel: FlutterMethodChannel?
+
+    override init() {
+      super.init()
+      synthesizer.delegate = self
+    }
+
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "personal_voice_flutter", binaryMessenger: registrar.messenger())
-        let instance = PersonalVoiceFlutterPlugin()
-        registrar.addMethodCallDelegate(instance, channel: channel)
+      let channel = FlutterMethodChannel(name: "personal_voice_flutter", binaryMessenger: registrar.messenger())
+      let instance = PersonalVoiceFlutterPlugin()
+      instance.channel = channel
+      registrar.addMethodCallDelegate(instance, channel: channel)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -136,5 +143,9 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin {
             result("Must use iOS 17 or higher to use personal voice")
         }
     }
-    
+
+    // Delegate method to notify when speech is finished
+    public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+      channel?.invokeMethod("onSpeechCompleted", arguments: nil)
+    }
 }

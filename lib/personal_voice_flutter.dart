@@ -37,4 +37,8 @@ class PersonalVoiceFlutter {
   Future<bool> isSupported() {
     return PersonalVoiceFlutterPlatform.instance.isSupported();
   }
+
+  void setOnSpeechComplete(void Function()? onCompleteFn) {
+    PersonalVoiceFlutterPlatform.instance.onSpeechComplete = onCompleteFn;
+  }
 }
