@@ -1,44 +1,64 @@
+import 'dart:io';
+
+import 'package:personal_voice_flutter/personal_voice_flutter_method_channel.dart';
+
 import 'personal_voice_flutter_platform_interface.dart';
 
 class PersonalVoiceFlutter {
+
+  static bool isInit = false;
+  late final PersonalVoiceFlutterPlatform _platformInstance;
+
+  PersonalVoiceFlutter() {
+
+    if(Platform.isIOS || Platform.isMacOS) {
+
+      if(!isInit) {
+        PersonalVoiceFlutterPlatform.instance = PersonalVoiceFlutterMethodChannel();
+        isInit = true;
+      }
+    }
+    _platformInstance = PersonalVoiceFlutterPlatform.instance;
+  }
+
   Future<String?> getPlatformVersion() {
-    return PersonalVoiceFlutterPlatform.instance.getPlatformVersion();
+    return _platformInstance.getPlatformVersion();
   }
 
   Future<String?> requestPersonalVoiceAuthorization() {
-    return PersonalVoiceFlutterPlatform.instance
+    return _platformInstance
         .requestPersonalVoiceAuthorization();
   }
 
   Future<void> speak(String sentence, {double volume = 0.5, double pitch = 1.0, double rate = 0.5}) {
-    return PersonalVoiceFlutterPlatform.instance.speak(sentence, volume: volume, pitch: pitch, rate: rate);
+    return _platformInstance.speak(sentence, volume: volume, pitch: pitch, rate: rate);
   }
 
   Future<void> stop() {
-    return PersonalVoiceFlutterPlatform.instance.stop();
+    return _platformInstance.stop();
   }
 
   Future<void> pause() {
-    return PersonalVoiceFlutterPlatform.instance.pause();
+    return _platformInstance.pause();
   }
 
   Future<void> resume() {
-    return PersonalVoiceFlutterPlatform.instance.resume();
+    return _platformInstance.resume();
   }
 
   Future<bool> isSpeaking() {
-    return PersonalVoiceFlutterPlatform.instance.isSpeaking();
+    return _platformInstance.isSpeaking();
   }
 
   Future<bool> isPaused() {
-    return PersonalVoiceFlutterPlatform.instance.isPaused();
+    return _platformInstance.isPaused();
   }
 
   Future<bool> isSupported() {
-    return PersonalVoiceFlutterPlatform.instance.isSupported();
+    return _platformInstance.isSupported();
   }
 
   void setOnSpeechComplete(void Function()? onCompleteFn) {
-    PersonalVoiceFlutterPlatform.instance.onSpeechComplete = onCompleteFn;
+    _platformInstance.onSpeechComplete = onCompleteFn;
   }
 }

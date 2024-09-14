@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:personal_voice_flutter/personal_voice_flutter.dart';
-import 'package:personal_voice_flutter/personal_voice_flutter_platform_interface.dart';
 import 'package:personal_voice_flutter/personal_voice_flutter_method_channel.dart';
+import 'package:personal_voice_flutter/personal_voice_flutter_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockPersonalVoiceFlutterPlatform
@@ -65,8 +65,8 @@ class MockPersonalVoiceFlutterPlatform
 void main() {
   final PersonalVoiceFlutterPlatform initialPlatform = PersonalVoiceFlutterPlatform.instance;
 
-  test('$MethodChannelPersonalVoiceFlutter is the default instance', () {
-    expect(initialPlatform, isInstanceOf<MethodChannelPersonalVoiceFlutter>());
+  test('$PersonalVoiceFlutterMethodChannel is the default instance', () {
+    expect(initialPlatform, isInstanceOf<PersonalVoiceFlutterMethodChannel>());
   });
 
   test('getPlatformVersion', () async {

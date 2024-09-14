@@ -1,4 +1,5 @@
 import Flutter
+import Foundation
 import UIKit
 import AVFoundation
 
@@ -65,15 +66,6 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin, AVSpeechSynthe
           result(FlutterMethodNotImplemented)
         }
     }
-
-    private func isSupported() -> Bool {
-
-      if #available(iOS 17.0, *) {
-        return true
-      }
-
-      return false
-    }
     
     private func speak(sentence:String, volume: Float, pitch: Float, rate: Float) {
         if #available(iOS 17.0, *) {
@@ -116,6 +108,10 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin, AVSpeechSynthe
           self.synthesizer.stopSpeaking(at: .immediate)
         }
     }
+
+    private func isSupported() -> Bool {
+      return isPersonalVoiceFeatureSupported();
+    }
     
     private func requestPersonalVoiceAuthorization(result: @escaping FlutterResult) {
         if #available(iOS 17.0, *) {
@@ -148,4 +144,54 @@ public class PersonalVoiceFlutterPlugin: NSObject, FlutterPlugin, AVSpeechSynthe
     public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
       channel?.invokeMethod("onSpeechCompleted", arguments: nil)
     }
+}
+// Function to check for supported device models on iOS
+func isSupportedDeviceOnIOS() -> Bool {
+    let modelIdentifier = getDeviceModelIdentifier()
+
+    // Check for iPhone 12 or later
+    if modelIdentifier.hasPrefix("iPhone") {
+        if let modelNumber = Int(modelIdentifier.split(separator: ",")[0].dropFirst(6)) {
+            return modelNumber >= 13 // iPhone 12 has identifier iPhone13,1 and up
+        }
+    }
+
+    // Check for iPad Air 5th gen or later, iPad Pro 11-inch 3rd gen or later, iPad Pro 12.9-inch 5th gen or later
+    if modelIdentifier == "iPad13,16" || modelIdentifier == "iPad13,17" || // iPad Air 5th gen
+       modelIdentifier.hasPrefix("iPad8,") && Int(modelIdentifier.split(separator: ",")[1])! >= 11 || // iPad Pro 11-inch 3rd gen
+       modelIdentifier.hasPrefix("iPad8,") && Int(modelIdentifier.split(separator: ",")[1])! >= 9 { // iPad Pro 12.9-inch 5th gen
+        return true
+    }
+
+    return false
+}
+
+// Function to check for supported device models on macOS
+func isSupportedDeviceOnMac() -> Bool {
+    #if targetEnvironment(macCatalyst)
+    if ProcessInfo.processInfo.isiOSAppOnMac || ProcessInfo.processInfo.isMacCatalystApp {
+        if let arch = NXGetLocalArchInfo()?.pointee.cputype, arch == CPU_TYPE_ARM64 {
+            return true // Mac with Apple Silicon
+        }
+    }
+    #endif
+
+    return false
+}
+
+// Helper function to get device model identifier (e.g., "iPhone13,1" for iPhone 12)
+func getDeviceModelIdentifier() -> String {
+    var systemInfo = utsname()
+    uname(&systemInfo)
+    return String(bytes: Data(bytes: &systemInfo.machine, count: Int(_SYS_NAMELEN)), encoding: .ascii)!.trimmingCharacters(in: .controlCharacters)
+}
+
+// Main function to check if the device supports the required features
+func isPersonalVoiceFeatureSupported() -> Bool {
+    if #available(iOS 17, *) {
+        return isSupportedDeviceOnIOS()
+    } else if #available(macOS 14, *) {
+        return isSupportedDeviceOnMac()
+    }
+    return false
 }

@@ -5,7 +5,7 @@ import 'package:personal_voice_flutter/personal_voice_flutter_method_channel.dar
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  MethodChannelPersonalVoiceFlutter platform = MethodChannelPersonalVoiceFlutter();
+  PersonalVoiceFlutterMethodChannel platform = PersonalVoiceFlutterMethodChannel();
   const MethodChannel channel = MethodChannel('personal_voice_flutter');
 
   setUp(() {

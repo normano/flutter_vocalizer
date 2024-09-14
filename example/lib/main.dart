@@ -40,6 +40,14 @@ class _MyAppState extends State<MyApp> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
+                FutureBuilder(future: _personalVoiceFlutterPlugin.isSupported(), builder: (context, snapshot) {
+
+                  if(snapshot.hasData) {
+                    return Text("IS SUPPORTED = ${snapshot.data!}");
+                  }
+
+                  return Text("IS SUPPORTED = ?????");
+                }),
                 const Text(
                     'Note: The phone must not be on silent for speech to play and you must have created a personal voice \n'),
                 TextField(
