@@ -73,6 +73,10 @@ class TTSManager(
     })
   }
 
+  fun clearVoice() {
+    tts.voice = tts.defaultVoice
+  }
+
   fun speak(text: String, volume: Float, rate: Float, pitch: Float) {
     if (text.length > maxSpeechInputLength) {
       val textChunks = splitTextByNaturalBoundaries(text, maxSpeechInputLength)

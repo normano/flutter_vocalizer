@@ -40,6 +40,7 @@ abstract class FlutterVocalizerPlatform extends PlatformInterface {
   Future<dynamic> setLanguage(String language);
   Future<List<TTSVoice>?> getVoices();
   Future<dynamic> setVoice(Map<String, String> voice);
+  Future<void> clearVoice();
   Future<int?> getMaxSpeechInputLength();
 }
 
@@ -112,6 +113,11 @@ class _DefaultFlutterVocalizer extends FlutterVocalizerPlatform {
 
   @override
   Future setVoice(Map<String, String> voice) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> clearVoice() {
     throw UnimplementedError();
   }
 

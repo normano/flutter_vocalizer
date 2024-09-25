@@ -79,6 +79,10 @@ class FlutterVocalizer {
     return _platformInstance.setVoice(voice.asVoiceMap());
   }
 
+  Future<void> resetVoice() {
+    return _platformInstance.clearVoice();
+  }
+
   Future<int?> getMaxSpeechInputLength() {
     return _platformInstance.getMaxSpeechInputLength();
   }

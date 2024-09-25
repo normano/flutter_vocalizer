@@ -124,6 +124,11 @@ class FlutterVocalizerMethodChannel extends FlutterVocalizerPlatform {
   }
 
   @override
+  Future<void> clearVoice() async {
+    await methodChannel.invokeMethod('clearVoice');
+  }
+
+  @override
   Future<int?> getMaxSpeechInputLength() async {
     return await methodChannel.invokeMethod<int?>('getMaxSpeechInputLength');
   }

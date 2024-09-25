@@ -95,6 +95,10 @@ public class FlutterVocalizerPlugin: NSObject, FlutterPlugin, AVSpeechSynthesize
         }
         result(ttsManager.setVoice(voice: args))
 
+      case "clearVoice":
+        ttsManager.clearVoice();
+        result(1);
+
       case "getPlatformVersion":
         result("iOS " + UIDevice.current.systemVersion)
 

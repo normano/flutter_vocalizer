@@ -97,6 +97,12 @@ class MockFlutterVocalizerPlatform
     // TODO: implement getMaxSpeechInputLength
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> clearVoice() {
+    // TODO: implement clearVoice
+    throw UnimplementedError();
+  }
 }
 
 void main() {

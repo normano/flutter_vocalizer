@@ -130,6 +130,10 @@ class TTSManager: NSObject, AVSpeechSynthesizerDelegate {
     }
   }
 
+  func clearVoice() {
+    self.currentVoice = nil
+  }
+
   func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
     onSpeechCompletion?()
   }

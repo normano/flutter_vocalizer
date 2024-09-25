@@ -92,6 +92,11 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
         result.success(ttsManager.setVoice(voice))
       }
 
+      "clearVoice" -> {
+        ttsManager.clearVoice()
+        result.success(true)
+      }
+
       "requestPersonalVoiceAuthorization" -> {
         result.error("UNSUPPORTED", "Personal Voice Is not Available", null)
       }
