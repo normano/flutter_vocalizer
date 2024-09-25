@@ -59,6 +59,11 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
         result("unsupported")
       }
 
+      "getMaxSpeechInputLength" -> {
+        val res = ttsManager.maxSpeechInputLength
+        result.success(res)
+      }
+
       else -> result.notImplemented()
     }
   }

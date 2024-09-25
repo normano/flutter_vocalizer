@@ -17,6 +17,7 @@ class TTSManager(
   var currentLanguage: Locale = Locale.getDefault()
   var currentVoice: String? = null
   private var actionQueue: TTSActionQueue = null
+  var maxSpeechLength: Int = TextToSpeech.getMaxSpeechInputLength()
 
   init {
     tts = TextToSpeech(context, this)
@@ -55,13 +56,23 @@ class TTSManager(
     })
   }
 
-  fun speak(text: String): String {
-    var id = "utteranceID_${System.currentTimeMillis()}";
-    actionQueue.addAction {
-      tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
+  fun speak(text: String) {
+    if (text.length > maxSpeechLength) {
+      val textChunks = splitTextByNaturalBoundaries(text, maxSpeechLength)
+      for (chunk in textChunks) {
+        var id = "utteranceID_${System.currentTimeMillis()}";
+        actionQueue.addAction {
+          tts.speak(chunk, TextToSpeech.QUEUE_FLUSH, null, id)
+        }
+      }
+    } else {
+      var id = "utteranceID_${System.currentTimeMillis()}";
+      actionQueue.addAction {
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
+      }
     }
+
     actionQueue.startQueue()
-    return id;
   }
 
   fun speakSSML(ssmlL: String) {
@@ -131,6 +142,7 @@ class TTSManager(
         voiceMap["locale"] = voice.locale.toLanguageTag()
         voiceMap["quality"] = voice.quality.toString()
         voiceMap["identifier"] = voice.name
+        voiceMap["gender"] = "unknown"
         voiceMap["isPersonalVoice"] = "false"
 
         voices.add(voiceMap)
@@ -220,5 +232,29 @@ class TTSManager(
     } else {
       500 // Default pause of 500ms
     }
+  }
+
+  private fun splitTextByNaturalBoundaries(text: String, maxSpeechLength: Int): List<String> {
+    val chunks = mutableListOf<String>()
+    var currentChunk = StringBuilder()
+
+    val sentences = text.split(Regex("(?<=\\.|!|\\?)\\s"))  // Split by sentence-ending punctuation
+
+    for (sentence in sentences) {
+      // If adding the current sentence exceeds the max length, start a new chunk
+      if (currentChunk.length + sentence.length > maxSpeechLength) {
+        chunks.add(currentChunk.toString().trim())
+        currentChunk = StringBuilder()
+      }
+
+      currentChunk.append(sentence).append(" ")
+    }
+
+    // Add the last chunk if any remaining text exists
+    if (currentChunk.isNotEmpty()) {
+      chunks.add(currentChunk.toString().trim())
+    }
+
+    return chunks
   }
 }
