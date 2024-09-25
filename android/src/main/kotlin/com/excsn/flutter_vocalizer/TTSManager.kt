@@ -2,6 +2,7 @@ package com.excsn.flutter_vocalizer
 
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
@@ -21,6 +22,7 @@ class TTSManager(
   private var tts: TextToSpeech
   private var actionQueue: TTSActionQueue
   private val tag = "TTS"
+  private val defaultPause = 500L;
 
   val mainHandler = android.os.Handler(context.mainLooper)
   val maxSpeechInputLength: Int = TextToSpeech.getMaxSpeechInputLength()
@@ -71,30 +73,24 @@ class TTSManager(
     })
   }
 
-  fun speak(text: String) {
+  fun speak(text: String, volume: Float, rate: Float, pitch: Float) {
     if (text.length > maxSpeechInputLength) {
       val textChunks = splitTextByNaturalBoundaries(text, maxSpeechInputLength)
       for (chunk in textChunks) {
-        var id = "utteranceID_${System.currentTimeMillis()}";
-        actionQueue.addAction {
-          tts.speak(chunk, TextToSpeech.QUEUE_FLUSH, null, id)
-        }
+        submitSpeakAction(chunk, volume, rate, pitch);
       }
     } else {
-      var id = "utteranceID_${System.currentTimeMillis()}";
-      actionQueue.addAction {
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
-      }
+      submitSpeakAction(text, volume, rate, pitch);
     }
 
     actionQueue.startQueue()
   }
 
-  fun speakSSML(ssml: String) {
+  fun speakSSML(ssml: String, volume: Float, rate: Float, pitch: Float) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      speak(ssml);
+      speak(ssml, volume, rate, pitch);
     } else {
-      parseSSMLAndQueueActions(ssml, actionQueue)
+      parseSSMLAndQueueActions(actionQueue, ssml, volume, rate, pitch)
     }
     actionQueue.startQueue()
   }
@@ -206,74 +202,85 @@ class TTSManager(
     return tts.isLanguageAvailable(locale) >= TextToSpeech.LANG_AVAILABLE
   }
 
-  private fun parseSSMLAndQueueActions(ssml: String, actionQueue: TTSActionQueue) {
+  private fun submitSpeakAction(text: String, volume: Float, rate: Float, pitch: Float) {
+    var id = "utteranceID_${System.currentTimeMillis()}";
+    actionQueue.addAction {
+      var bundle = Bundle();
+      bundle.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume)
+
+      tts.setSpeechRate(rate)
+      tts.setPitch(pitch)
+      tts.speak(text, TextToSpeech.QUEUE_FLUSH, bundle, id)
+    }
+  }
+
+  private fun parseSSMLAndQueueActions(actionQueue: TTSActionQueue, ssml: String, volume: Float, rate: Float, pitch: Float) {
     try {
       val parser: XmlPullParser = XmlPullParserFactory.newInstance().newPullParser()
       parser.setInput(StringReader(ssml))
 
+      var currentRate = rate;
+      var currentPitch = pitch;
+      var currentVolume = volume;
       var eventType: Int = parser.getEventType()
+
       while (eventType != XmlPullParser.END_DOCUMENT) {
         val tagName: String = parser.getName()
 
         when (eventType) {
           XmlPullParser.START_TAG -> if ("prosody".equals(tagName)) {
-            val rate: String = parser.getAttributeValue(null, "rate")
-            val pitch: String = parser.getAttributeValue(null, "pitch")
+            val newRate: String? = parser.getAttributeValue(null, "rate")
+            val newPitch: String? = parser.getAttributeValue(null, "pitch")
+            val newVolume: String? = parser.getAttributeValue(null, "volume")
+
             if (rate != null) {
-              actionQueue.addAction { tts.setSpeechRate(convertRate(rate)) }
+              currentRate = convertRate(newRate, currentRate)
             }
+
             if (pitch != null) {
-              actionQueue.addAction { tts.setPitch(convertPitch(pitch)) }
+              currentPitch = convertPitch(newPitch, currentPitch);
+            }
+
+            if (pitch != null) {
+              currentVolume = convertVolume(newVolume, currentVolume);
             }
           } else if ("break".equals(tagName)) {
             val time: String = parser.getAttributeValue(null, "time")
+            val strength = parser.getAttributeValue(null, "strength")
             if (time != null) {
-              val pauseTime = parseTimeToMillis(time)
+              val pauseTime = convertToPauseDuration(time, strength)
               actionQueue.addAction { tts.playSilentUtterance(pauseTime, TextToSpeech.QUEUE_ADD, null) }
             }
+          } else if ("p".equals(tagName) || "s".equals(tagName)) {
+            // default pause for sentences or paragraphs
+            actionQueue.addAction { tts.playSilentUtterance(defaultPause, TextToSpeech.QUEUE_ADD, null) }
           } else if ("emphasis".equals(tagName)) {
-            actionQueue.addAction { tts.setPitch(1.3f) } // Emphasis
+            val level = parser.getAttributeValue(null, "level")
+            val convertedValues = convertEmphasis(level, currentRate, currentPitch)
+            currentRate = convertedValues[0];
+            currentPitch = convertedValues[1];
           }
 
           XmlPullParser.TEXT -> {
             val text: String = parser.getText()
-            actionQueue.addAction { tts.speak(text, TextToSpeech.QUEUE_ADD, null, "utteranceID") }
+            submitSpeakAction(text, volume, currentRate, currentPitch)
           }
 
-          XmlPullParser.END_TAG -> if ("emphasis".equals(tagName)) {
-            actionQueue.addAction { tts.setPitch(1.0f) } // Reset pitch
+          XmlPullParser.END_TAG -> {
+            val tagName = parser.name
+            if ("emphasis".equals(tagName)) {
+              currentPitch = pitch
+            } else if ("prosody".equals(tagName)) {
+              currentPitch = pitch
+              currentRate = rate
+              currentVolume = volume
+            }
           }
         }
         eventType = parser.next()
       }
     } catch (e: Exception) {
       e.printStackTrace()
-    }
-  }
-
-  private fun convertRate(rate: String): Float {
-    return when (rate) {
-      "fast" -> 1.5f
-      "slow" -> 0.75f
-      else -> 1.0f
-    }
-  }
-
-  private fun convertPitch(pitch: String): Float {
-    return when (pitch) {
-      "high" -> 1.5f
-      "low" -> 0.75f
-      else -> 1.0f
-    }
-  }
-
-  private fun parseTimeToMillis(time: String): Long {
-    return if (time.endsWith("ms")) {
-      time.replace("ms", "").toLong()
-    } else if (time.endsWith("s")) {
-      time.replace("s", "").toLong() * 1000
-    } else {
-      500 // Default pause of 500ms
     }
   }
 
@@ -299,5 +306,131 @@ class TTSManager(
     }
 
     return chunks
+  }
+
+  fun convertToPauseDuration(time: String?, strength: String?): Long {
+    // Convert 'time' if it exists, otherwise use 'strength'
+    return when {
+      time != null -> {
+        // Remove "ms" if present and parse the time to Long
+        parseTimeToMillis(time)
+      }
+      strength != null -> {
+        // Use predefined durations based on 'strength'
+        when (strength) {
+          "none" -> 0L
+          "x-weak" -> 100L  // Very short pause
+          "weak" -> 200L
+          "medium" -> 500L   // Medium pause (default)
+          "strong" -> 800L
+          "x-strong" -> 1000L // Long pause
+          else -> 500L       // Default to medium pause if unrecognized
+        }
+      }
+      else -> 500L // Default to a medium pause if neither 'time' nor 'strength' is provided
+    }
+  }
+
+  fun convertEmphasis(level: String?, currentRate: Float, currentPitch: Float): List<Float> {
+    var newRate = currentRate
+    var newPitch = currentPitch
+    when (level) {
+      "strong" -> {
+        newRate *= 1.1f // Slightly increase rate
+        newPitch *= 1.2f // Increase pitch for emphasis
+      }
+      "moderate" -> {
+        newRate *= 1.05f
+        newPitch *= 1.1f
+      }
+      "reduced" -> {
+        newRate *= 0.95f
+        newPitch *= 0.9f
+      }
+      else -> {
+        // no change for other levels
+      }
+    }
+
+    return listOf(newRate, newPitch);
+  }
+
+  private fun convertPitch(pitch: String?, baselinePitch: Float): Float {
+    return when (pitch) {
+      null -> baselinePitch
+      "x-low" -> baselinePitch * 0.5f
+      "low" -> baselinePitch * 0.75f
+      "medium" -> baselinePitch * 1.0f
+      "high" -> baselinePitch * 1.5f
+      "x-high" -> baselinePitch * 2.0f
+      else -> {
+        // For relative values like "+20%" or "-10%"
+        if (pitch.contains("%")) {
+          val value = pitch.replace("%", "").toFloatOrNull()
+          value?.let {
+            if (pitch.startsWith("+")) baselinePitch * (1.0f + it / 100) else baselinePitch * (1.0f - it / 100)
+          } ?: baselinePitch // If parsing fails, return the baseline
+        } else {
+          baselinePitch // Default pitch
+        }
+      }
+    }
+  }
+
+  // Convert rate values from SSML to Android's TTS values
+  private fun convertRate(rate: String?, baselineRate: Float): Float {
+    return when (rate) {
+      null -> baselineRate
+      "x-slow" -> baselineRate * 0.5f
+      "slow" -> baselineRate * 0.75f
+      "medium" -> baselineRate * 1.0f
+      "fast" -> baselineRate * 1.5f
+      "x-fast" -> baselineRate * 2.0f
+      else -> {
+        // For relative values like "+50%" or "-25%"
+        if (rate.contains("%")) {
+          val value = rate.replace("%", "").toFloatOrNull()
+          value?.let {
+            if (rate.startsWith("+")) baselineRate * (1.0f + it / 100) else baselineRate * (1.0f - it / 100)
+          } ?: baselineRate
+        } else {
+          baselineRate // Default rate
+        }
+      }
+    }
+  }
+
+  // Convert volume values from SSML to Android's TTS values
+  private fun convertVolume(volume: String?, baselineVolume: Float): Float {
+    return when (volume) {
+      null -> baselineVolume
+      "silent" -> 0.0f
+      "x-soft" -> baselineVolume * 0.25f
+      "soft" -> baselineVolume * 0.5f
+      "medium" -> baselineVolume * 1.0f
+      "loud" -> baselineVolume * 1.5f
+      "x-loud" -> baselineVolume * 2.0f
+      else -> {
+        // For relative values like "+20%" or "-10%"
+        if (volume.contains("%")) {
+          val value = volume.replace("%", "").toFloatOrNull()
+          value?.let {
+            if (volume.startsWith("+")) baselineVolume * (1.0f + it / 100) else baselineVolume * (1.0f - it / 100)
+          } ?: baselineVolume
+        } else {
+          baselineVolume // Default volume
+        }
+      }
+    }
+  }
+
+  private fun parseTimeToMillis(time: String): Long {
+    return if (time.endsWith("ms")) {
+      time.replace("ms", "").toLong()
+    } else if (time.endsWith("s")) {
+      time.replace("s", "").toLong() * 1000
+    } else {
+      0
+    }
   }
 }

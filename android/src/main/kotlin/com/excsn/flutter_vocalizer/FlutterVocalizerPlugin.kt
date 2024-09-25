@@ -25,8 +25,12 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
     when (call.method) {
       "speak" -> {
         val text: String? = call.argument("text")
+        val rate: Float = (call.argument("rate") ?: 0.5).toFloat() * 2.0f
+        val volume: Float = (call.argument("volume") as? Double)?.toFloat() ?: 1.0f
+        val pitch: Float = (call.argument("pitch") as? Double)?.toFloat() ?: 1.0f
+
         if(text != null) {
-          ttsManager.speak(text)
+          ttsManager.speak(text, volume, rate, pitch)
           result.success(1)
         } else {
           result.success(0)
@@ -35,8 +39,12 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
 
       "speakSSML" -> {
         val ssmlText: String? = call.argument("ssml")
+        val rate: Float = (call.argument("rate") ?: 0.5).toFloat() * 2.0f
+        val volume: Float = (call.argument("volume") as? Double)?.toFloat() ?: 1.0f
+        val pitch: Float = (call.argument("pitch") as? Double)?.toFloat() ?: 1.0f
+
         if(ssmlText != null) {
-          ttsManager.speakSSML(ssmlText)
+          ttsManager.speakSSML(ssmlText, volume, rate, pitch)
           result.success(1)
         } else {
           result.success(0)
