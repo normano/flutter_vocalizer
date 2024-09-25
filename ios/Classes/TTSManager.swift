@@ -32,12 +32,16 @@ class TTSManager: NSObject, AVSpeechSynthesizerDelegate {
   }
 
   func speakSSML(ssml: String, volume: Float, pitch: Float, rate: Float) {
-    if let utterance = AVSpeechUtterance(ssmlRepresentation: ssml) {
-      utterance.volume = volume
-      utterance.pitchMultiplier = pitch
-      utterance.rate = rate
-      utterance.voice = currentVoice ?? AVSpeechSynthesisVoice(language: self.language)
-      synthesizer.speak(utterance)
+    if #available(iOS 16.0, *) {
+      if let utterance = AVSpeechUtterance(ssmlRepresentation: ssml) {
+        utterance.volume = volume
+        utterance.pitchMultiplier = pitch
+        utterance.rate = rate
+        utterance.voice = currentVoice ?? AVSpeechSynthesisVoice(language: self.language)
+        synthesizer.speak(utterance)
+      }
+    } else {
+      self.speak(text: ssml, volume: volume, pitch: pitch, rate: rate)
     }
   }
 
