@@ -14,7 +14,7 @@ public class FlutterVocalizerPlugin: NSObject, FlutterPlugin, AVSpeechSynthesize
 
     // Set completion callback
     ttsManager.onSpeechCompletion = { [weak self] in
-        self?.channel?.invokeMethod("onSpeechCompleted", arguments: nil)
+      self?.channel?.invokeMethod("onSpeechCompleted", arguments: nil)
     }
   }
 
