@@ -15,7 +15,7 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
   private lateinit var channel : MethodChannel
   private lateinit var ttsManager: TTSManager
 
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPluginBinding) {
+  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_vocalizer")
     channel.setMethodCallHandler(this)
     ttsManager = TTSManager(flutterPluginBinding.getApplicationContext(), channel)
@@ -24,15 +24,23 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
   override fun onMethodCall(call: MethodCall, result: Result) {
     when (call.method) {
       "speak" -> {
-        val text: String = call.argument("text")
-        ttsManager.speak(text)
-        result.success(null)
+        val text: String? = call.argument("text")
+        if(text != null) {
+          ttsManager.speak(text)
+          result.success(1)
+        } else {
+          result.success(0)
+        }
       }
 
       "speakSSML" -> {
-        val ssml: String = call.argument("ssml")
-        ttsManager.speakSSML(text)
-        result.success(null)
+        val ssmlText: String? = call.argument("ssml")
+        if(ssmlText != null) {
+          ttsManager.speakSSML(ssmlText)
+          result.success(1)
+        } else {
+          result.success(0)
+        }
       }
 
       "pause" -> {
@@ -50,13 +58,38 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
         result.success(null)
       }
 
-      "getPlatformVersion" -> {
-        result.success("Android ${android.os.Build.VERSION.RELEASE}")
+      "isSpeaking" -> {
+        result.success(ttsManager.isSpeaking())
       }
 
+      "isPaused" -> {
+        result.success(ttsManager.isPaused())
+      }
+
+      "isPaused" -> {
+        result.success(ttsManager.isPaused())
+      }
+
+      "getLanguages" -> {
+        result.success(ttsManager.getLanguages())
+      }
+
+      "setLanguage" -> {
+        val language: String = call.arguments.toString()
+        result.success(ttsManager.setLanguage(language))
+      }
+
+      "getVoices" -> {
+        result.success(ttsManager.getVoices())
+      }
+
+      "setVoice" -> {
+        val voice: HashMap<String, String>? = call.arguments()
+        result.success(ttsManager.setVoice(voice))
+      }
 
       "requestPersonalVoiceAuthorization" -> {
-        result("unsupported")
+        result.error("UNSUPPORTED", "Personal Voice Is not Available", null)
       }
 
       "getMaxSpeechInputLength" -> {
@@ -64,11 +97,15 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
         result.success(res)
       }
 
+      "getPlatformVersion" -> {
+        result.success("Android ${android.os.Build.VERSION.RELEASE}")
+      }
+
       else -> result.notImplemented()
     }
   }
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPluginBinding?) {
+  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     channel.setMethodCallHandler(null)
     ttsManager.shutdown()
   }

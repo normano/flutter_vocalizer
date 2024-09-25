@@ -22,7 +22,7 @@ const ssmlStory ="""
   <break time="500ms"/> in a land far, far away, <prosody pitch="medium">there lived a mighty king</prosody>. 
   He ruled with <emphasis level="moderate">great wisdom</emphasis> and courage.
 
-  <break time="300ms"/>
+  <break time="3000ms"/>
   The people <prosody rate="slow">loved him</prosody> dearly, for under his reign, the kingdom thrived.
 
   <break time="400ms"/>
@@ -140,6 +140,14 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     );
   }
 
+  Future<bool> isPersonalVoiceSupported() async {
+    try {
+      return _flutterVocalizerPlugin.isPersonalVoiceSupported();
+    } catch (e) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -189,12 +197,12 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                     child: Column(
                       children: [
                         FutureBuilder(
-                            future: _flutterVocalizerPlugin.isPersonalVoiceSupported(),
+                            future: isPersonalVoiceSupported(),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
-                                return Text("IS SUPPORTED = ${snapshot.data!}");
+                                return Text("Personal Voice SUPPORTED = ${snapshot.data!}");
                               }
-                              return const Text("IS SUPPORTED = ?????");
+                              return const Text("Personal Voice SUPPORTED = ?????");
                             }),
                         const Text(
                             'Note: The phone must not be on silent for speech to play and you must have created a personal voice \n'),

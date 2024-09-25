@@ -1,7 +1,12 @@
+package com.excsn.flutter_vocalizer
+
+import android.speech.tts.TextToSpeech
+
+import java.util.*
 
 class TTSActionQueue(tts: TextToSpeech) {
   private val actionQueue: Queue<Runnable> = LinkedList()
-  private var isPaused = false
+  private var _isPaused = false
   private var isStopped = false
   private val tts: TextToSpeech = tts
 
@@ -21,12 +26,12 @@ class TTSActionQueue(tts: TextToSpeech) {
   }
 
   fun pauseQueue() {
-    isPaused = true
+    _isPaused = true
     tts.stop() // Stop speaking but preserve the queue
   }
 
   fun resumeQueue() {
-    isPaused = false
+    _isPaused = false
     playNextAction()
   }
 
@@ -38,12 +43,12 @@ class TTSActionQueue(tts: TextToSpeech) {
     actionQueue.clear()
   }
 
-  private fun playNextAction() {
+  fun playNextAction() {
     if (isStopped || actionQueue.isEmpty()) {
       return
     }
 
-    if (!isPaused && !actionQueue.isEmpty()) {
+    if (!_isPaused && !actionQueue.isEmpty()) {
       val nextAction: Runnable = actionQueue.poll()
       nextAction.run()
     }
@@ -51,8 +56,12 @@ class TTSActionQueue(tts: TextToSpeech) {
 
   // Hook into TTS UtteranceListener to know when TTS finishes speaking
   fun onUtteranceCompleted() {
-    if (!isPaused && !isStopped) {
+    if (!_isPaused && !isStopped) {
       playNextAction()
     }
+  }
+
+  fun isPaused(): Boolean {
+    return _isPaused
   }
 }

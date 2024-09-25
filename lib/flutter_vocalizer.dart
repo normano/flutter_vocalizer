@@ -12,7 +12,7 @@ class FlutterVocalizer {
 
   FlutterVocalizer() {
 
-    if(Platform.isIOS || Platform.isMacOS) {
+    if(Platform.isIOS || Platform.isMacOS || Platform.isAndroid) {
 
       if(!isInit) {
         FlutterVocalizerPlatform.instance = FlutterVocalizerMethodChannel();

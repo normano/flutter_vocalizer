@@ -1,64 +1,79 @@
+package com.excsn.flutter_vocalizer
+
 import android.content.Context
+import android.os.Build
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import android.speech.tts.Voice
 import android.util.Log
+import io.flutter.plugin.common.MethodChannel
 
 import java.io.StringReader
-import java.util.Locale
+import java.util.*
 
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 
 class TTSManager(
-  private val context: Context
+  private val context: Context,
   private val methodChannel: MethodChannel
 ) : TextToSpeech.OnInitListener {
-  private var tts: TextToSpeech? = null
+  private var tts: TextToSpeech
+  private var actionQueue: TTSActionQueue
+  private val tag = "TTS"
+
+  val mainHandler = android.os.Handler(context.mainLooper)
+  val maxSpeechInputLength: Int = TextToSpeech.getMaxSpeechInputLength()
+
   var currentLanguage: Locale = Locale.getDefault()
   var currentVoice: String? = null
-  private var actionQueue: TTSActionQueue = null
-  var maxSpeechLength: Int = TextToSpeech.getMaxSpeechInputLength()
 
   init {
-    tts = TextToSpeech(context, this)
-    ttsActionQueue = TTSActionQueue(tts!!)
+    this.tts = TextToSpeech(context, this)
+    this.actionQueue = TTSActionQueue(tts)
   }
 
   override fun onInit(status: Int) {
     if (status == TextToSpeech.SUCCESS) {
-      val result = tts?.setLanguage(Locale.US)  // Default language to US English
+      val result = tts.setLanguage(Locale.US)  // Default language to US English
       if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
         Log.e("TTSManager", "Language not supported!")
       }
       setTTSListeners()
-      Log.i("TTSManager", " nitialized successfully")
+      Log.i("TTSManager", "Initialized successfully")
     } else {
       Log.e("TTSManager", "Initialization failed!")
     }
   }
 
   private fun setTTSListeners() {
-    tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+    tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
       override fun onStart(utteranceId: String?) {
-        methodChannel.invokeMethod("onSpeechStart", utteranceId)
+        mainHandler.post {
+          methodChannel.invokeMethod("onSpeechStart", utteranceId)
+        }
       }
 
       override fun onDone(utteranceId: String?) {
-        ttsActionQueue.next()
-        if (!ttsActionQueue.hasPendingActions()) {
-          methodChannel.invokeMethod("onSpeechCompleted", utteranceId)
+        mainHandler.post {
+          actionQueue.playNextAction()
+          if (!actionQueue.hasPendingActions()) {
+            methodChannel.invokeMethod("onSpeechCompleted", utteranceId)
+          }
         }
       }
 
       override fun onError(utteranceId: String?) {
-        methodChannel.invokeMethod("onSpeechError", utteranceId)
+        mainHandler.post {
+          methodChannel.invokeMethod("onSpeechError", utteranceId)
+        }
       }
     })
   }
 
   fun speak(text: String) {
-    if (text.length > maxSpeechLength) {
-      val textChunks = splitTextByNaturalBoundaries(text, maxSpeechLength)
+    if (text.length > maxSpeechInputLength) {
+      val textChunks = splitTextByNaturalBoundaries(text, maxSpeechInputLength)
       for (chunk in textChunks) {
         var id = "utteranceID_${System.currentTimeMillis()}";
         actionQueue.addAction {
@@ -75,8 +90,12 @@ class TTSManager(
     actionQueue.startQueue()
   }
 
-  fun speakSSML(ssmlL: String) {
-    parseSSMLAndQueueActions(ssml, actionQueue)
+  fun speakSSML(ssml: String) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      speak(ssml);
+    } else {
+      parseSSMLAndQueueActions(ssml, actionQueue)
+    }
     actionQueue.startQueue()
   }
 
@@ -93,11 +112,15 @@ class TTSManager(
   }
 
   fun shutdown() {
-    tts?.shutdown()
+    tts.shutdown()
   }
 
   fun isSpeaking(): Boolean {
-    return tts?.isSpeaking ?: false
+    return tts.isSpeaking ?: false
+  }
+
+  fun isPaused(): Boolean {
+    return actionQueue.isPaused()
   }
 
   fun getLanguages(): List<String> {
@@ -106,7 +129,7 @@ class TTSManager(
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         // While this method was introduced in API level 21, it seems that it
         // has not been implemented in the speech service side until API Level 23.
-        for (locale in tts!!.availableLanguages) {
+        for (locale in tts.availableLanguages) {
           locales.add(locale.toLanguageTag())
         }
       } else {
@@ -125,17 +148,23 @@ class TTSManager(
     return locales;
   }
 
-  fun setLanguage(language: String?) {
+  fun setLanguage(language: String?): Int {
     if (language != null) {
       currentLanguage = Locale(language)
-      tts?.language = currentLanguage
+
+      if(tts != null) {
+        tts.language = currentLanguage
+        return 1
+      }
     }
+
+    return 0
   }
 
   fun getVoices(): List<Map<String, String>> {
     val voices = mutableListOf<Map<String, String>>()
     try {
-      val availableVoices: Set<Voice> = tts?.voices ?: emptySet()
+      val availableVoices: Set<Voice> = tts.voices ?: emptySet()
       for (voice in availableVoices) {
         val voiceMap = mutableMapOf<String, String>()
         voiceMap["name"] = voice.name
@@ -147,20 +176,33 @@ class TTSManager(
 
         voices.add(voiceMap)
       }
-      result.success(voices)
     } catch (e: NullPointerException) {
       Log.d(tag, "getVoices: " + e.message)
-      result.success(null)
     }
+
     return voices
   }
 
-  fun setVoice(voice: Map<String, String>?) {
+  fun setVoice(voice: Map<String, String>?): Int {
+
     if (voice != null) {
-      val voiceName = voice["name"]
-      // Set the TTS voice using voiceName if available
-      // Voice selection logic can be added here
+      for (ttsVoice in tts.voices) {
+        if (
+          ttsVoice.name == voice["name"] &&
+          ttsVoice.locale.toLanguageTag() == voice["locale"]
+        ) {
+          tts.voice = ttsVoice
+          return 1
+        }
+      }
     }
+
+    Log.d(tag, "Voice name not found: $voice")
+    return 0
+  }
+
+  fun isLanguageAvailable(locale: Locale?): Boolean {
+    return tts.isLanguageAvailable(locale) >= TextToSpeech.LANG_AVAILABLE
   }
 
   private fun parseSSMLAndQueueActions(ssml: String, actionQueue: TTSActionQueue) {
@@ -226,9 +268,9 @@ class TTSManager(
 
   private fun parseTimeToMillis(time: String): Long {
     return if (time.endsWith("ms")) {
-      Long.parseLong(time.replace("ms", ""))
+      time.replace("ms", "").toLong()
     } else if (time.endsWith("s")) {
-      Long.parseLong(time.replace("s", "")) * 1000
+      time.replace("s", "").toLong() * 1000
     } else {
       500 // Default pause of 500ms
     }

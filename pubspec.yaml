@@ -20,5 +20,8 @@ dev_dependencies:
 flutter:
   plugin:
     platforms:
+      android:
+        package: com.excsn.flutter_vocalizer
+        pluginClass: FlutterVocalizerPlugin
       ios:
         pluginClass: FlutterVocalizerPlugin
