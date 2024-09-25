@@ -112,6 +112,7 @@ class TTSManager(
   }
 
   fun shutdown() {
+    Log.e("TTSManager", "Shutting down")
     tts.shutdown()
   }
 

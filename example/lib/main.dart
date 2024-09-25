@@ -22,7 +22,7 @@ const ssmlStory ="""
   <break time="500ms"/> in a land far, far away, <prosody pitch="medium">there lived a mighty king</prosody>. 
   He ruled with <emphasis level="moderate">great wisdom</emphasis> and courage.
 
-  <break time="3000ms"/>
+  <break time="1000ms"/>
   The people <prosody rate="slow">loved him</prosody> dearly, for under his reign, the kingdom thrived.
 
   <break time="400ms"/>

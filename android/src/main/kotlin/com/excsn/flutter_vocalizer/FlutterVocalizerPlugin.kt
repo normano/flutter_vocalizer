@@ -66,10 +66,6 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
         result.success(ttsManager.isPaused())
       }
 
-      "isPaused" -> {
-        result.success(ttsManager.isPaused())
-      }
-
       "getLanguages" -> {
         result.success(ttsManager.getLanguages())
       }
@@ -90,6 +86,10 @@ class FlutterVocalizerPlugin: FlutterPlugin, MethodCallHandler {
 
       "requestPersonalVoiceAuthorization" -> {
         result.error("UNSUPPORTED", "Personal Voice Is not Available", null)
+      }
+
+      "isPersonalVoiceSupported" -> {
+        result.success(false)
       }
 
       "getMaxSpeechInputLength" -> {

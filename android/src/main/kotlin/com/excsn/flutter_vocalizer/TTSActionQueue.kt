@@ -27,7 +27,8 @@ class TTSActionQueue(tts: TextToSpeech) {
 
   fun pauseQueue() {
     _isPaused = true
-    tts.stop() // Stop speaking but preserve the queue
+    tts.stop()
+    //TODO Not really supported need to store the current action and put it back into the queue with addFirst
   }
 
   fun resumeQueue() {
@@ -44,12 +45,13 @@ class TTSActionQueue(tts: TextToSpeech) {
   }
 
   fun playNextAction() {
-    if (isStopped || actionQueue.isEmpty()) {
+    val shouldContinue = hasPendingActions();
+    if (isStopped || !shouldContinue) {
       return
     }
 
-    if (!_isPaused && !actionQueue.isEmpty()) {
-      val nextAction: Runnable = actionQueue.poll()
+    if (!_isPaused && shouldContinue) {
+      val nextAction: Runnable = actionQueue.remove()
       nextAction.run()
     }
   }
