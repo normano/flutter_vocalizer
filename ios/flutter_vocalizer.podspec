@@ -1,9 +1,9 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint personal_voice_flutter.podspec` to validate before publishing.
+# Run `pod lib lint flutter_vocalizer.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'personal_voice_flutter'
+  s.name             = 'flutter_vocalizer'
   s.version          = '0.0.1'
   s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC

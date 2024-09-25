@@ -1,27 +1,27 @@
 PODS:
   - Flutter (1.0.0)
-  - integration_test (0.0.1):
+  - flutter_vocalizer (0.0.1):
     - Flutter
-  - personal_voice_flutter (0.0.1):
+  - integration_test (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - flutter_vocalizer (from `.symlinks/plugins/flutter_vocalizer/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
-  - personal_voice_flutter (from `.symlinks/plugins/personal_voice_flutter/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  flutter_vocalizer:
+    :path: ".symlinks/plugins/flutter_vocalizer/ios"
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
-  personal_voice_flutter:
-    :path: ".symlinks/plugins/personal_voice_flutter/ios"
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_vocalizer: 703a8aa77a2a174183b92748188b9aa26c40cb27
   integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
-  personal_voice_flutter: e893b2e295c431c14a84b2c0c2dba1104696cd9f
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 

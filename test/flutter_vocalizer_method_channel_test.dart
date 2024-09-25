@@ -1,12 +1,12 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:personal_voice_flutter/personal_voice_flutter_method_channel.dart';
+import 'package:flutter_vocalizer/flutter_vocalizer_method_channel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  PersonalVoiceFlutterMethodChannel platform = PersonalVoiceFlutterMethodChannel();
-  const MethodChannel channel = MethodChannel('personal_voice_flutter');
+  FlutterVocalizerMethodChannel platform = FlutterVocalizerMethodChannel();
+  const MethodChannel channel = MethodChannel('flutter_vocalizer');
 
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(

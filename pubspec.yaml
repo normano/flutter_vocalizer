@@ -1,7 +1,7 @@
-name: personal_voice_flutter
-description: This project uses the iOS personal voice to speak text in your own voice.
-version: 0.0.2
-homepage: https://github.com/rockarts/personal_voice_flutter
+name: flutter_vocalizer
+description: Provides text to speech capabilities on iOS and Android. iOS 17+ for personal voice to speak text in your own voice. SSML support.
+version: 1.0.0+1
+homepage: https://github.com/normano/flutter_vocalizer
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
@@ -21,4 +21,4 @@ flutter:
   plugin:
     platforms:
       ios:
-        pluginClass: PersonalVoiceFlutterPlugin
+        pluginClass: FlutterVocalizerPlugin

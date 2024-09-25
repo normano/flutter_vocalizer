@@ -1,6 +1,6 @@
-# personal_voice_flutter_example
+# flutter_vocalizer_example
 
-Demonstrates how to use the personal_voice_flutter plugin.
+Demonstrates how to use the flutter_vocalizer plugin.
 
 ## Getting Started
 

@@ -1,16 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'personal_voice_flutter_platform_interface.dart';
+import 'flutter_vocalizer_platform_interface.dart';
 
-/// An implementation of [PersonalVoiceFlutterPlatform] that uses method channels.
-class PersonalVoiceFlutterMethodChannel extends PersonalVoiceFlutterPlatform {
+/// An implementation of [FlutterVocalizerPlatform] that uses method channels.
+class FlutterVocalizerMethodChannel extends FlutterVocalizerPlatform {
 
   /// The method channel used to interact with the native platform.
   @visibleForTesting
-  final methodChannel = const MethodChannel('personal_voice_flutter');
+  final methodChannel = const MethodChannel('flutter_vocalizer');
 
-  PersonalVoiceFlutterMethodChannel() {
+  FlutterVocalizerMethodChannel() {
     methodChannel.setMethodCallHandler(_methodCallHandler);
   }
 
@@ -54,6 +54,20 @@ class PersonalVoiceFlutterMethodChannel extends PersonalVoiceFlutterPlatform {
   }
 
   @override
+  Future<void> speakSSML(String ssml, {double volume = 0.5, double pitch = 1.0, double rate = 0.5}) async {
+
+    await methodChannel.invokeMethod(
+      'speakSSML',
+      {
+        "ssml": ssml,
+        'volume': volume,
+        'pitch': pitch,
+        'rate': rate,
+      }
+    );
+  }
+
+  @override
   Future<void> stop() async {
     await methodChannel.invokeMethod('stop');
   }
@@ -79,8 +93,39 @@ class PersonalVoiceFlutterMethodChannel extends PersonalVoiceFlutterPlatform {
   }
 
   @override
-  Future<bool> isSupported() async {
-    final bool isSupported = await methodChannel.invokeMethod('isSupported');
+  Future<bool> isPersonalVoiceSupported() async {
+    final bool isSupported = await methodChannel.invokeMethod('isPersonalVoiceSupported');
     return isSupported;
+  }
+
+  @override
+  Future<List<String>?> getLanguages() async {
+    final List<String>? languages = await methodChannel.invokeListMethod('getLanguages');
+    return languages;
+  }
+
+  @override
+  Future<dynamic> setLanguage(String language) async {
+    return await methodChannel.invokeMethod('setLanguage', language);
+  }
+
+  @override
+  Future<List<Map<String, String>>?> getVoices() async {
+    final List<Map<String, String>> voices = (await methodChannel.invokeListMethod<Map<Object?, Object?>>(
+      'getVoices'
+    ))?.map((voice) => voice.map(
+      (key, value) => MapEntry(key?.toString() ?? '', value?.toString() ?? '')
+    )).toList() ?? [];
+    return voices;
+  }
+
+  @override
+  Future<dynamic> setVoice(Map<String, String> voice) async {
+    return await methodChannel.invokeMethod('setVoice', voice);
+  }
+
+  @override
+  Future<int?> getMaxSpeechInputLength() async {
+    return await methodChannel.invokeMethod<int?>('getMaxSpeechInputLength');
   }
 }
