@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_vocalizer/flutter_vocalizer_method_channel.dart';
+import 'package:flutter_vocalizer/model.dart';
 
 import 'flutter_vocalizer_platform_interface.dart';
 
@@ -70,12 +71,12 @@ class FlutterVocalizer {
     return _platformInstance.setLanguage(language);
   }
 
-  Future<List<Map<String, String>>?> getVoices() {
+  Future<List<TTSVoice>?> getVoices() {
     return _platformInstance.getVoices();
   }
 
-  Future<dynamic> setVoice(Map<String, String> voice) {
-    return _platformInstance.setVoice(voice);
+  Future<dynamic> setVoice(TTSVoice voice) {
+    return _platformInstance.setVoice(voice.asVoiceMap());
   }
 
   Future<int?> getMaxSpeechInputLength() {

@@ -1,3 +1,4 @@
+import 'package:flutter_vocalizer/model.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 abstract class FlutterVocalizerPlatform extends PlatformInterface {
@@ -37,7 +38,7 @@ abstract class FlutterVocalizerPlatform extends PlatformInterface {
   Future<bool> isPersonalVoiceSupported();
   Future<List<String>?> getLanguages();
   Future<dynamic> setLanguage(String language);
-  Future<List<Map<String, String>>?> getVoices();
+  Future<List<TTSVoice>?> getVoices();
   Future<dynamic> setVoice(Map<String, String> voice);
   Future<int?> getMaxSpeechInputLength();
 }
@@ -100,7 +101,7 @@ class _DefaultFlutterVocalizer extends FlutterVocalizerPlatform {
   }
 
   @override
-  Future<List<Map<String, String>>> getVoices() {
+  Future<List<TTSVoice>?> getVoices() {
     throw UnimplementedError();
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_vocalizer/flutter_vocalizer.dart';
 import 'package:flutter_vocalizer/flutter_vocalizer_method_channel.dart';
 import 'package:flutter_vocalizer/flutter_vocalizer_platform_interface.dart';
+import 'package:flutter_vocalizer/model.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockFlutterVocalizerPlatform
@@ -74,7 +75,7 @@ class MockFlutterVocalizerPlatform
   }
 
   @override
-  Future<List<Map<String, String>>> getVoices() {
+  Future<List<TTSVoice>?> getVoices() {
     // TODO: implement getVoices
     throw UnimplementedError();
   }

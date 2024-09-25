@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_vocalizer/model.dart';
 
 import 'flutter_vocalizer_platform_interface.dart';
 
@@ -110,12 +111,10 @@ class FlutterVocalizerMethodChannel extends FlutterVocalizerPlatform {
   }
 
   @override
-  Future<List<Map<String, String>>?> getVoices() async {
-    final List<Map<String, String>> voices = (await methodChannel.invokeListMethod<Map<Object?, Object?>>(
+  Future<List<TTSVoice>?> getVoices() async {
+    final voices = (await methodChannel.invokeListMethod<Map<Object?, Object?>>(
       'getVoices'
-    ))?.map((voice) => voice.map(
-      (key, value) => MapEntry(key?.toString() ?? '', value?.toString() ?? '')
-    )).toList() ?? [];
+    ))?.map((voice) => TTSVoice.fromMap(voice)).toList() ?? [];
     return voices;
   }
 

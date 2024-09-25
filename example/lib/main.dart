@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_vocalizer/flutter_vocalizer.dart';
+import 'package:flutter_vocalizer/model.dart';
 
 var scaffoldKey = GlobalKey();
 const ssmlText =
@@ -61,9 +62,9 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   List<String> _languages = [];
-  List<Map<String, String>> _voices = [];
+  List<TTSVoice> _voices = [];
   String? _selectedLanguage;
-  Map<String, String>? _selectedVoice;
+  TTSVoice? _selectedVoice;
   bool isPlaying = false;
 
   @override
@@ -96,7 +97,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     var voices = await _flutterVocalizerPlugin.getVoices();
     setState(() {
       _voices = voices?.where((voice) {
-        return voice["locale"] == _selectedLanguage;
+        return voice.locale == _selectedLanguage;
       }).toList() ?? [];
       _selectedVoice = _voices.isNotEmpty ? _voices[0] : null;
     });
@@ -122,12 +123,12 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildVoiceDropdown() {
-    return DropdownButton<Map<String, String>>(
+    return DropdownButton<TTSVoice>(
       value: _selectedVoice,
-      items: _voices.map<DropdownMenuItem<Map<String, String>>>((voice) {
-        return DropdownMenuItem<Map<String, String>>(
+      items: _voices.map<DropdownMenuItem<TTSVoice>>((voice) {
+        return DropdownMenuItem<TTSVoice>(
           value: voice,
-          child: Text(voice['name'] ?? ''),
+          child: Text(voice.name ?? ''),
         );
       }).toList(),
       onChanged: (value) {
