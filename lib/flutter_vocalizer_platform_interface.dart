@@ -30,9 +30,9 @@ abstract class FlutterVocalizerPlatform extends PlatformInterface {
   Future<String?> requestPersonalVoiceAuthorization();
   Future<void> speak(String text, {double volume = 0.5, double pitch = 1.0, double rate = 0.5});
   Future<void> speakSSML(String ssml, {double volume = 0.5, double pitch = 1.0, double rate = 0.5});
-  Future<void> stop();
+  Future<void> stop(bool immediate);
   Future<void> resume();
-  Future<void> pause();
+  Future<void> pause(bool immediate);
   Future<bool> isSpeaking();
   Future<bool> isPaused();
   Future<bool> isPersonalVoiceSupported();
@@ -67,7 +67,7 @@ class _DefaultFlutterVocalizer extends FlutterVocalizerPlatform {
   }
 
   @override
-  Future<void> stop() {
+  Future<void> stop(bool immediate) {
     throw UnimplementedError('stop() has not been implemented.');
   }
 
@@ -77,7 +77,7 @@ class _DefaultFlutterVocalizer extends FlutterVocalizerPlatform {
   }
 
   @override
-  Future<void> pause() {
+  Future<void> pause(bool immediate) {
     throw UnimplementedError('pauseSpeaking() has not been implemented.');
   }
 

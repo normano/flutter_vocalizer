@@ -45,12 +45,24 @@ class TTSManager: NSObject, AVSpeechSynthesizerDelegate {
     }
   }
 
-  func stop() {
-    synthesizer.stopSpeaking(at: .immediate)
+  func stop(immediate: Bool) -> Bool {
+    let boundary = if(immediate) {
+      AVSpeechBoundary.word
+    } else {
+      AVSpeechBoundary.immediate
+    }
+
+    return synthesizer.stopSpeaking(at: boundary)
   }
 
-  func pause() {
-    synthesizer.pauseSpeaking(at: .immediate)
+  func pause(immediate: Bool) -> Bool {
+    let boundary = if(immediate) {
+      AVSpeechBoundary.word
+    } else {
+      AVSpeechBoundary.immediate
+    }
+
+    return synthesizer.pauseSpeaking(at: boundary);
   }
 
   func resume() {

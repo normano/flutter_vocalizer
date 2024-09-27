@@ -58,12 +58,20 @@ public class FlutterVocalizerPlugin: NSObject, FlutterPlugin, AVSpeechSynthesize
         result(nil)
 
       case "stop":
-        ttsManager.stop()
-        result(nil)
+        var ret = false;
+        if let args = call.arguments as? [String: Any] {
+          let immediate = (args["immediate"] as? Bool) ?? false;
+          ret = ttsManager.stop(immediate: immediate)
+        }
+        result(ret)
 
       case "pause":
-        ttsManager.pause()
-        result(nil)
+        var ret = false;
+        if let args = call.arguments as? [String: Any] {
+          let immediate = (args["immediate"] as? Bool) ?? false;
+          ret = ttsManager.pause(immediate: immediate)
+        }
+        result(ret)
 
       case "resume":
         ttsManager.resume()

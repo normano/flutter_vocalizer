@@ -69,8 +69,13 @@ class FlutterVocalizerMethodChannel extends FlutterVocalizerPlatform {
   }
 
   @override
-  Future<void> stop() async {
-    await methodChannel.invokeMethod('stop');
+  Future<void> stop(bool immediate) async {
+    await methodChannel.invokeMethod(
+      'stop',
+      {
+        'immediate': immediate,
+      }
+    );
   }
 
   @override
@@ -79,8 +84,13 @@ class FlutterVocalizerMethodChannel extends FlutterVocalizerPlatform {
   }
 
   @override
-  Future<void> pause() async {
-    await methodChannel.invokeMethod('pause');
+  Future<void> pause(bool immediate) async {
+    await methodChannel.invokeMethod(
+      'pause',
+      {
+        'immediate': immediate,
+      }
+    );
   }
 
   @override

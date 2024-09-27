@@ -39,12 +39,16 @@ class FlutterVocalizer {
     return _platformInstance.speakSSML(ssml);
   }
 
-  Future<void> stop() {
-    return _platformInstance.stop();
+  /// Stop speech immediately or after word. Defaults to immediate.
+  /// NOTE: arg immediate only supported on iOS.
+  Future<void> stop({bool immediate = true}) {
+    return _platformInstance.stop(immediate);
   }
 
-  Future<void> pause() {
-    return _platformInstance.pause();
+  /// Pauses speech immediately or after word. Defaults to word.
+  /// NOTE: arg immediate only supported on iOS.
+  Future<void> pause({bool immediate = false}) {
+    return _platformInstance.pause(immediate);
   }
 
   Future<void> resume() {

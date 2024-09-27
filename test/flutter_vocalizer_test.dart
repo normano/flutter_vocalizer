@@ -36,7 +36,7 @@ class MockFlutterVocalizerPlatform
   }
 
   @override
-  Future<void> pause() {
+  Future<void> pause(bool immediate) {
     // TODO: implement pause
     throw UnimplementedError();
   }
@@ -48,7 +48,7 @@ class MockFlutterVocalizerPlatform
   }
 
   @override
-  Future<void> stop() {
+  Future<void> stop(bool immediate) {
     // TODO: implement stop
     throw UnimplementedError();
   }
